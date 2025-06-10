@@ -7,15 +7,20 @@ import {
   TouchableOpacity,
 } from "react-native";
 
+import Header from "./components/Header";
+
 import CustomCard from "./components/CustomCard";
 
 export default function App() {
   return (
     <View style={styles.container}>
       {/* Cabeçalho */}
-      <View style={styles.header}>
+
+      <Header style={styles.header} />
+
+      {/* <View style={styles.header}>
         <Text style={styles.headerText}>Minha Tela Estilizada</Text>
-      </View>
+      </View> */}
 
       {/* Conteúdo Principal */}
       <View style={styles.content}>
@@ -40,6 +45,15 @@ export default function App() {
         />
         <TouchableOpacity
           style={styles.actionButton}
+          onPress={() => Alert.alert("Ação", "Botão de ação clicado!")}
+        >
+          <Text style={styles.buttonText}>Ação</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.actionButton,
+            { backgroundColor: "green", borderRadius: 50 },
+          ]}
           onPress={() => Alert.alert("Ação", "Botão de ação clicado!")}
         >
           <Text style={styles.buttonText}>Ação</Text>
