@@ -10,7 +10,7 @@ import Card from "./components/Card";
 
 export default function App() {
   const handleCardPress = () => {
-    Alert.alert("Card Pressionado", `Você tocou no card!`);
+    Alert.alert("Card Clicado", `Você tocou no card!`);
   };
 
   return (
@@ -27,17 +27,17 @@ export default function App() {
           style={styles.image}
         />
         <Text style={styles.subtitle}>Explorando Estilos no React Native</Text>
+      </View>
 
-        {/* Seção de Cards */}
-        <View style={styles.cardSection}>
-          <TouchableOpacity onPress={() => handleCardPress}>
-            <Card texto="Card 1: Estilização com Flex" />
-          </TouchableOpacity>
+      {/* Seção de Cards */}
+      <View style={styles.cardSection}>
+        <TouchableOpacity onPress={() => handleCardPress}>
+          <Card texto="Card 1: Estilização com Flex" />
+        </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => handleCardPress}>
-            <Card texto="Card 2: Layouts Responsivos" />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={() => handleCardPress}>
+          <Card texto="Card 2: Layouts Responsivos" />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -73,9 +73,25 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#333",
     textAlign: "center",
-    marginBottom: 20,
   },
   cardSection: {
-    width: "100%",
+    padding: 20,
+  },
+  card: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  cardText: {
+    fontSize: 16,
+    color: "#333",
   },
 });
