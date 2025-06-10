@@ -6,13 +6,10 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import Card from "./components/Card";
+
+import CustomCard from "./components/CustomCard";
 
 export default function App() {
-  const handleCardPress = () => {
-    Alert.alert("Card Clicado", `Você tocou no card!`);
-  };
-
   return (
     <View style={styles.container}>
       {/* Cabeçalho */}
@@ -31,12 +28,21 @@ export default function App() {
 
       {/* Seção de Cards */}
       <View style={styles.cardSection}>
-        <TouchableOpacity onPress={() => handleCardPress}>
-          <Card texto="Card 1: Estilização com Flex" />
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => handleCardPress}>
-          <Card texto="Card 2: Layouts Responsivos" />
+        <CustomCard
+          titulo="Card 1: Estilização"
+          corFundo="#ffebcd"
+          onPress={() => Alert.alert("Custom Card", "Card 1 Clicado!")}
+        />
+        <CustomCard
+          titulo="Card 1: Estilização"
+          corFundo="#ffebcd"
+          onPress={() => Alert.alert("Custom Card", "Card 1 Clicado!")}
+        />
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => Alert.alert("Ação", "Botão de ação clicado!")}
+        >
+          <Text style={styles.buttonText}>Ação</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -52,11 +58,28 @@ const styles = StyleSheet.create({
     backgroundColor: "#007bff",
     padding: 20,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  actionButton: {
+    backgroundColor: "#28a745",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   headerText: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#e6f3ff",
   },
   content: {
     flex: 1,
@@ -76,22 +99,5 @@ const styles = StyleSheet.create({
   },
   cardSection: {
     padding: 20,
-  },
-  card: {
-    backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  cardText: {
-    fontSize: 16,
-    color: "#333",
   },
 });
