@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import Saudacao from "./components/Saudacao";
 import Card from "./components/Card";
+import Header from "./components/Header";
 
 export default function App() {
   const handleButtonPress = () => {
@@ -21,9 +22,11 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      <Header />
       <Text style={styles.title}>Bem-vindo ao React Native!</Text>
       <Saudacao />
-      <Card />
+      <Card texto="Card 1: Bem-vindo!" />
+      <Card texto="Card 2: React Native é incrível!" />
       <Image
         source={{ uri: "https://reactnative.dev/img/logo-og.png" }}
         style={styles.image}
@@ -38,6 +41,21 @@ export default function App() {
         onPress={handleTouchablePress}
       >
         <Text style={styles.buttonText}>Botão Personalizado</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.customButton, { backgroundColor: "#dc3545" }]}
+        onPress={() => Alert.alert("Atenção", "Botão vermelho clicado!")}
+      >
+        <Text style={styles.buttonText}>Botão Vermelho</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.customButton,
+          { backgroundColor: "#green", borderRadius: 15 },
+        ]}
+        onPress={() => Alert.alert("Atenção", "Botão verde clicado!")}
+      >
+        <Text style={styles.buttonText}>Botão Verde</Text>
       </TouchableOpacity>
     </View>
   );

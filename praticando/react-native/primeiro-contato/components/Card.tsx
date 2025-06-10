@@ -1,9 +1,13 @@
 import { View, Text, StyleSheet } from "react-native";
 
-export default function Card() {
+// type CardProps = {
+//   texto: string;
+// };
+
+export default function Card(props: { texto: string }) {
   return (
     <View style={styles.card}>
-      <Text style={styles.cardText}>Minha Primeira Tela Interativa</Text>
+      <Text style={styles.cardText}>{props.texto}</Text>
     </View>
   );
 }
@@ -21,5 +25,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
+    color: "#fff",
   },
 });
