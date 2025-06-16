@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "primeiro-contato",
-    "slug": "primeiro-contato",
+    "name": "praticando-react-native",
+    "slug": "praticando-react-native",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
