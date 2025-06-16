@@ -1,12 +1,12 @@
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 
-export default function HomeScreen(props: { navigation: any }) {
+export default function HomeScreen({ navigation }: any) {
   return (
     <View style={[styles.container]}>
       <Text style={styles.title}>Tela Inicial</Text>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => props.navigation.navigate("Details")}
+        onPress={() => navigation.navigate("Details")}
       >
         <Text style={styles.buttonText}>Ir para Detalhes</Text>
       </TouchableOpacity>
