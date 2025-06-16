@@ -10,6 +10,14 @@ export default function ProfileScreen({ navigation }: any) {
       >
         <Text style={styles.buttonText}>Voltar para Home</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() =>
+          navigation.navigate("Details", { mensagem: "Olá do Perfil!" })
+        }
+      >
+        <Text style={styles.buttonText}>Ir para Detalhes</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -33,6 +41,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
+    margin: 2,
   },
   buttonText: {
     color: "#fff",

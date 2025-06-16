@@ -32,8 +32,8 @@ export default function App() {
           name="Profile"
           component={ProfileScreen}
           options={{
-            title: "Perfil",
-            headerStyle: { backgroundColor: "#28a745" },
+            title: "Meu Perfil",
+            headerStyle: { backgroundColor: "#17a2b8" },
             headerTintColor: "#fff",
           }}
         />
