@@ -1,12 +1,15 @@
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 
-export default function DetailsScreen({ navigation }: any) {
+export default function DetailsScreen({ navigation, route }: any) {
+  const { mensagem } = route.params || {};
+
   return (
     <View style={[styles.container]}>
       <Text style={styles.title}>Tela de Detalhes</Text>
+      <Text style={styles.message}>{mensagem || "Nenhuma mensagem"}</Text>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate("Home")}
+        onPress={() => navigation.goBack()}
       >
         <Text style={styles.buttonText}>Voltar</Text>
       </TouchableOpacity>
@@ -38,5 +41,10 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  message: {
+    fontSize: 18,
+    color: "#333",
+    marginBottom: 20,
   },
 });

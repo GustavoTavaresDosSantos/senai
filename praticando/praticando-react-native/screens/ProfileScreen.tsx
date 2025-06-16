@@ -1,20 +1,14 @@
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 
-export default function HomeScreen({ navigation }: any) {
+export default function ProfileScreen({ navigation }: any) {
   return (
     <View style={[styles.container]}>
-      <Text style={styles.title}>Tela Inicial</Text>
+      <Text style={styles.title}>Tela de Perfil</Text>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate("Details")}
+        onPress={() => navigation.navigate("Home")}
       >
-        <Text style={styles.buttonText}>Ir para Detalhes</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: "#28a745" }]}
-        onPress={() => navigation.navigate("Profile")}
-      >
-        <Text style={styles.buttonText}>Ir para Perfil</Text>
+        <Text style={styles.buttonText}>Voltar para Home</Text>
       </TouchableOpacity>
     </View>
   );
@@ -35,11 +29,10 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   button: {
-    backgroundColor: "#007bff",
+    backgroundColor: "#28a745",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
-    margin: 2,
   },
   buttonText: {
     color: "#fff",
