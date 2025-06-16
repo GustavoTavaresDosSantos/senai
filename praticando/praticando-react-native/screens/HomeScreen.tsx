@@ -6,7 +6,9 @@ export default function HomeScreen({ navigation }: any) {
       <Text style={styles.title}>Tela Inicial</Text>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate("Details")}
+        onPress={() =>
+          navigation.navigate("Details", { mensagem: "Olá do Home!" })
+        }
       >
         <Text style={styles.buttonText}>Ir para Detalhes</Text>
       </TouchableOpacity>
