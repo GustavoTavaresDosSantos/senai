@@ -24,6 +24,13 @@ export default function ProfileScreen({ navigation }: any) {
       >
         <Text style={styles.buttonText}>Ir para ScrollView</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: "#28a745" }]}
+        onPress={() => navigation.navigate("Form")}
+      >
+        <Text style={styles.buttonText}>Ir para Formulário</Text>
+      </TouchableOpacity>
     </View>
   );
 }

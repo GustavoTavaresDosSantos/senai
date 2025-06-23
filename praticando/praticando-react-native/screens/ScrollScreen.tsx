@@ -5,24 +5,39 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
+import { useState } from "react";
 
 export default function ScrollScreen({ navigation }: any) {
+  const [clickCount, setClickCount] = useState(0);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tela com ScrollView</Text>
-      <ScrollView style={styles.scrollContainer}>
+      <Text style={styles.counterText}>Itens clicados: {clickCount}</Text>
+
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         {Array.from({ length: 20 }).map((_, index) => (
-          <View key={index} style={styles.item}>
+          <TouchableOpacity
+            key={index}
+            style={styles.item}
+            onPress={() => {
+              setClickCount((prevCount) => prevCount + 1);
+              navigation.navigate("Details", {
+                mensagem: `Item ${index + 1} clicado!`,
+              });
+            }}
+          >
             <Text style={styles.itemText}>Item {index + 1}</Text>
-          </View>
+          </TouchableOpacity>
         ))}
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Home")}
+        >
+          <Text style={styles.buttonText}>Voltar para Home</Text>
+        </TouchableOpacity>
       </ScrollView>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Home")}
-      >
-        <Text style={styles.buttonText}>Voltar para Home</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -40,8 +55,14 @@ const styles = StyleSheet.create({
     color: "#333",
     textAlign: "center",
   },
+  counterText: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 10,
+    textAlign: "center",
+  },
   scrollContainer: {
-    flex: 1,
+    paddingBottom: 20,
   },
   item: {
     backgroundColor: "#fff",
@@ -61,6 +82,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 5,
     alignItems: "center",
+    marginTop: 20,
   },
   buttonText: {
     color: "#fff",
