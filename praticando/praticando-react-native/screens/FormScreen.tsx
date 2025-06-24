@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import { useState, useEffect } from "react";
 
-// ...importações iguais
 export default function FormScreen({ navigation }: any) {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
