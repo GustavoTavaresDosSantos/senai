@@ -5,6 +5,7 @@ interface TaskCardProps {
   completed: boolean;
   onPress?: () => void;
   onToggle?: () => void;
+  userId?: number | null;
 }
 
 export default function TaskCard({
@@ -12,6 +13,7 @@ export default function TaskCard({
   completed,
   onPress,
   onToggle,
+  userId,
 }: TaskCardProps) {
   return (
     <View
@@ -32,6 +34,7 @@ export default function TaskCard({
           <Text style={styles.toggleText}>{completed ? "✔" : "○"}</Text>
         </TouchableOpacity>
       )}
+      <Text style={styles.sourceText}>{!userId ? "Local" : "API"}</Text>
     </View>
   );
 }
@@ -73,5 +76,10 @@ const styles = StyleSheet.create({
   toggleText: {
     fontSize: 20,
     color: "#007bff",
+  },
+  sourceText: {
+    fontSize: 12,
+    color: "#999",
+    marginTop: 5,
   },
 });
