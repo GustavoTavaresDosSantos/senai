@@ -7,6 +7,8 @@ import {
   StyleSheet,
 } from "react-native";
 import TaskCard from "../components/TaskCard";
+import CustomButton from "../components/CustomButton";
+import CustomModal from "../components/CustomModal";
 
 interface Task {
   id: string;
@@ -23,6 +25,8 @@ export default function HomeScreen({ navigation }: any) {
   ]);
 
   const [filter, setFilter] = useState<"all" | "pending" | "completed">("all");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
 
   const filteredTasks = tasks.filter((task) => {
     if (filter === "pending") return !task.completed;
@@ -59,20 +63,49 @@ export default function HomeScreen({ navigation }: any) {
     );
   };
 
+  const deleteTask = () => {
+    setTasks((prev) => prev.filter((task) => task.id !== taskToDelete));
+    setModalVisible(false);
+    setTaskToDelete(null);
+  };
+
+  const renderItem = ({ item }: { item: Task }) => {
+    const isLocal = typeof item.id === "string";
+
+    return (
+      <View>
+        <Text style={styles.sourceText}>{isLocal ? "Local" : "API"}</Text>
+        <TaskCard
+          title={item.title}
+          completed={item.completed}
+          onPress={() => (isLocal ? handleTaskPress(item) : null)}
+          onToggle={() => (isLocal ? toggleTask(item.id) : null)}
+          onDelete={() => {
+            if (isLocal) {
+              setTaskToDelete(item.id);
+              setModalVisible(true);
+            }
+          }}
+          isLocal={isLocal}
+        />
+      </View>
+    );
+  };
+
   return (
     <View style={{ flex: 1, padding: 20 }}>
       <FlatList
         data={filteredTasks}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TaskCard
-            title={item.title}
-            completed={item.completed}
-            onPress={() => handleTaskPress(item)}
-            onToggle={() => toggleTask(item.id)}
-            userId={item.userId}
-          />
-        )}
+        renderItem={renderItem}
+      />
+
+      <CustomModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        title="Confirmar Exclusão"
+        message="Deseja realmente excluir esta tarefa?"
+        onConfirm={deleteTask}
       />
 
       <View style={styles.filterContainer}>
@@ -104,6 +137,14 @@ export default function HomeScreen({ navigation }: any) {
           <Text style={styles.addButtonText}>+ Nova Tarefa</Text>
         </TouchableOpacity>
       </View>
+
+      <CustomModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        title="Confirmar Exclusão"
+        message="Deseja realmente excluir esta tarefa?"
+        onConfirm={deleteTask}
+      />
     </View>
   );
 }
@@ -140,5 +181,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  sourceText: {
+    marginLeft: 5,
+    marginBottom: 5,
+    fontSize: 12,
+    color: "#999",
   },
 });

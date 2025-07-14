@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "./screens/HomeScreen";
 import DetailsScreen from "./screens/DetailsScreen";
 import AddTaskScreen from "./screens/AddTaskScreen";
+import CustomHeader from "./components/CustomHeader";
 
 const Stack = createStackNavigator();
 
@@ -32,9 +33,7 @@ export default function App() {
           name="Details"
           component={DetailsScreen}
           options={{
-            title: "Detalhes",
-            headerStyle: { backgroundColor: "#dc3545" },
-            headerTintColor: "#fff",
+            header: () => <CustomHeader title="Detalhes da Tarefa" />,
           }}
         />
       </Stack.Navigator>
