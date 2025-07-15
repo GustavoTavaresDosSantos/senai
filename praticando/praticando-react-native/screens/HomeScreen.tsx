@@ -2,110 +2,61 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
   FlatList,
   StyleSheet,
+  TouchableOpacity,
 } from "react-native";
+import { useTasks } from "../contexts/TaskContext";
 import TaskCard from "../components/TaskCard";
-import CustomButton from "../components/CustomButton";
 import CustomModal from "../components/CustomModal";
 
-interface Task {
-  id: string;
-  title: string;
-  description?: string;
-  completed: boolean;
-  userId: number | null;
-}
-
 export default function HomeScreen({ navigation }: any) {
-  const [tasks, setTasks] = useState<Task[]>([
-    { id: "1", title: "Comprar pão", completed: false, userId: null },
-    { id: "2", title: "Estudar React Native", completed: true, userId: 1 },
-  ]);
+  const {
+    localTasks,
+    deleteTask,
+    toggleTaskCompletion,
+    getCompletedCount,
+    clearTasks,
+    theme,
+    toggleTheme,
+  } = useTasks();
 
   const [filter, setFilter] = useState<"all" | "pending" | "completed">("all");
   const [modalVisible, setModalVisible] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
+  const [clearModalVisible, setClearModalVisible] = useState(false);
 
-  const filteredTasks = tasks.filter((task) => {
+  const filteredTasks = localTasks.filter((task) => {
     if (filter === "pending") return !task.completed;
     if (filter === "completed") return task.completed;
     return true;
   });
 
-  const addTask = ({
-    title,
-    description = "",
-  }: {
-    title: string;
-    description?: string;
-  }) => {
-    const newTask: Task = {
-      id: Date.now().toString(),
-      title,
-      description,
-      completed: false,
-      userId: null,
-    };
-    setTasks((prev) => [newTask, ...prev]);
-  };
-
-  const handleTaskPress = (task: Task) => {
-    navigation.navigate("Details", { item: task });
-  };
-
-  const toggleTask = (id: string) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task
-      )
-    );
-  };
-
-  const deleteTask = () => {
-    setTasks((prev) => prev.filter((task) => task.id !== taskToDelete));
-    setModalVisible(false);
-    setTaskToDelete(null);
-  };
-
-  const renderItem = ({ item }: { item: Task }) => {
-    const isLocal = typeof item.id === "string";
-
-    return (
-      <View>
-        <Text style={styles.sourceText}>{isLocal ? "Local" : "API"}</Text>
-        <TaskCard
-          title={item.title}
-          completed={item.completed}
-          onPress={() => (isLocal ? handleTaskPress(item) : null)}
-          onToggle={() => (isLocal ? toggleTask(item.id) : null)}
-          onDelete={() => {
-            if (isLocal) {
-              setTaskToDelete(item.id);
-              setModalVisible(true);
-            }
-          }}
-          isLocal={isLocal}
-        />
-      </View>
-    );
-  };
+  const renderItem = ({ item }: any) => (
+    <TaskCard
+      title={item.title}
+      completed={item.completed}
+      onPress={() => navigation.navigate("Details", { item })}
+      onToggle={() => toggleTaskCompletion(item.id)}
+      onDelete={() => {
+        setTaskToDelete(item.id);
+        setModalVisible(true);
+      }}
+      isLocal
+    />
+  );
 
   return (
-    <View style={{ flex: 1, padding: 20 }}>
+    <View style={[styles.container, theme === "dark" && styles.darkContainer]}>
+      <Text style={styles.countText}>
+        Tarefas: {filteredTasks.length} | Concluídas: {getCompletedCount()}
+      </Text>
+
       <FlatList
         data={filteredTasks}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-      />
-
-      <CustomModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        title="Confirmar Exclusão"
-        message="Deseja realmente excluir esta tarefa?"
-        onConfirm={deleteTask}
+        contentContainerStyle={{ paddingBottom: 80 }}
       />
 
       <View style={styles.filterContainer}>
@@ -129,31 +80,67 @@ export default function HomeScreen({ navigation }: any) {
         ))}
       </View>
 
-      <View style={styles.addButtonContainer}>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => navigation.navigate("AddTask", { addTask })}
-        >
-          <Text style={styles.addButtonText}>+ Nova Tarefa</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("AddTask")}
+      >
+        <Text style={styles.buttonText}>+ Nova Tarefa</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: "#dc3545", marginTop: 10 }]}
+        onPress={() => setClearModalVisible(true)}
+      >
+        <Text style={styles.buttonText}>Limpar Tarefas</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: "#6c757d", marginTop: 10 }]}
+        onPress={toggleTheme}
+      >
+        <Text style={styles.buttonText}>
+          Mudar para tema {theme === "light" ? "escuro" : "claro"}
+        </Text>
+      </TouchableOpacity>
 
       <CustomModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         title="Confirmar Exclusão"
         message="Deseja realmente excluir esta tarefa?"
-        onConfirm={deleteTask}
+        onConfirm={() => {
+          if (taskToDelete) deleteTask(taskToDelete);
+          setModalVisible(false);
+        }}
+      />
+
+      <CustomModal
+        visible={clearModalVisible}
+        onClose={() => setClearModalVisible(false)}
+        title="Limpar Tarefas"
+        message="Deseja apagar todas as tarefas locais?"
+        onConfirm={() => {
+          clearTasks();
+          setClearModalVisible(false);
+        }}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#fff",
+  },
+  darkContainer: {
+    backgroundColor: "#333",
+  },
   filterContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginBottom: 10,
+    marginVertical: 10,
   },
   filterButton: {
     padding: 10,
@@ -167,25 +154,21 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 14,
   },
-  addButtonContainer: {
-    alignItems: "center",
-    marginTop: 10,
-  },
-  addButton: {
+  button: {
     backgroundColor: "#28a745",
     paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 5,
+    alignItems: "center",
+    marginHorizontal: 20,
   },
-  addButtonText: {
+  buttonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },
-  sourceText: {
-    marginLeft: 5,
-    marginBottom: 5,
-    fontSize: 12,
-    color: "#999",
+  countText: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: "#000",
   },
 });
