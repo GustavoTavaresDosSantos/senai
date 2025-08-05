@@ -1,20 +1,20 @@
-import React from "react";
-import { StyleSheet, Modal, View, Text } from "react-native";
-import CustomButton from "./CustomButton";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from "react-native-reanimated";
+import React, { useState } from "react";
+import {
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+} from "react-native";
 
 interface CustomModalProps {
   visible: boolean;
   onClose: () => void;
   title: string;
   message: string;
-  confirmText?: string;
-  cancelText?: string;
-  onConfirm: () => void;
+  onConfirm: (text?: string) => void;
+  showTextInput?: boolean;
 }
 
 export default function CustomModal({
@@ -22,46 +22,53 @@ export default function CustomModal({
   onClose,
   title,
   message,
-  confirmText = "Confirmar",
-  cancelText = "Cancelar",
   onConfirm,
+  showTextInput = false,
 }: CustomModalProps) {
-  const scale = useSharedValue(0);
+  const [inputText, setInputText] = useState("");
 
-  React.useEffect(() => {
-    scale.value = visible ? withSpring(1) : withSpring(0);
-  }, [visible]);
+  const handleConfirm = () => {
+    onConfirm(showTextInput ? inputText : undefined);
+    setInputText("");
+  };
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
+  const handleClose = () => {
+    setInputText("");
+    onClose();
+  };
 
   return (
     <Modal
-      transparent
       visible={visible}
-      animationType="none"
-      onRequestClose={onClose}
+      transparent
+      animationType="fade"
+      onRequestClose={handleClose}
     >
       <View style={styles.overlay}>
-        <Animated.View style={[styles.modalContainer, animatedStyle]}>
-          <Text style={styles.modalTitle}>{title}</Text>
-          <Text style={styles.modalMessage}>{message}</Text>
+        <View style={styles.modal}>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.message}>{message}</Text>
+          
+          {showTextInput && (
+            <TextInput
+              style={styles.textInput}
+              value={inputText}
+              onChangeText={setInputText}
+              placeholder="Cole o JSON aqui..."
+              multiline
+              numberOfLines={4}
+            />
+          )}
+
           <View style={styles.buttonContainer}>
-            <CustomButton
-              title={cancelText}
-              onPress={onClose}
-              color="#dc3545"
-              style={styles.modalButton}
-            />
-            <CustomButton
-              title={confirmText}
-              onPress={onConfirm}
-              color="#28a745"
-              style={styles.modalButton}
-            />
+            <TouchableOpacity style={styles.cancelButton} onPress={handleClose}>
+              <Text style={styles.cancelButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+              <Text style={styles.confirmButtonText}>Confirmar</Text>
+            </TouchableOpacity>
           </View>
-        </Animated.View>
+        </View>
       </View>
     </Modal>
   );
@@ -74,32 +81,61 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  modalContainer: {
+  modal: {
     backgroundColor: "#fff",
+    padding: 20,
     borderRadius: 10,
     width: "80%",
-    padding: 20,
-    alignItems: "center",
+    maxWidth: 400,
   },
-  modalTitle: {
-    fontSize: 20,
+  title: {
+    fontSize: 18,
     fontWeight: "bold",
-    color: "#333",
     marginBottom: 10,
+    textAlign: "center",
   },
-  modalMessage: {
+  message: {
     fontSize: 16,
-    color: "#666",
     marginBottom: 20,
     textAlign: "center",
+    color: "#666",
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 20,
+    textAlignVertical: "top",
+    minHeight: 100,
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "100%",
   },
-  modalButton: {
+  cancelButton: {
     flex: 1,
-    marginHorizontal: 5,
+    backgroundColor: "#6c757d",
+    paddingVertical: 10,
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  confirmButton: {
+    flex: 1,
+    backgroundColor: "#dc3545",
+    paddingVertical: 10,
+    borderRadius: 5,
+    marginLeft: 10,
+  },
+  cancelButtonText: {
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+  confirmButtonText: {
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "bold",
   },
 });
+

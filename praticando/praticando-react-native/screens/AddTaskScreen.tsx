@@ -25,8 +25,10 @@ export default function AddTaskScreen({ route, navigation }: any) {
 
     if (task) {
       updateTask(task.id, { title, description });
+      Alert.alert("Sucesso", "Tarefa atualizada com sucesso!");
     } else {
       addTask({ title, description });
+      Alert.alert("Sucesso", "Tarefa adicionada com sucesso!");
     }
 
     navigation.goBack();

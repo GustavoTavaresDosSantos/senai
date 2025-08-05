@@ -19,12 +19,15 @@ export default function HomeScreen({ navigation }: any) {
     clearTasks,
     theme,
     toggleTheme,
+    exportTasks,
+    importTasks,
   } = useTasks();
 
   const [filter, setFilter] = useState<"all" | "pending" | "completed">("all");
   const [modalVisible, setModalVisible] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
   const [clearModalVisible, setClearModalVisible] = useState(false);
+  const [importModalVisible, setImportModalVisible] = useState(false);
 
   const filteredTasks = localTasks.filter((task) => {
     if (filter === "pending") return !task.completed;
@@ -56,7 +59,7 @@ export default function HomeScreen({ navigation }: any) {
         data={filteredTasks}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        contentContainerStyle={{ paddingBottom: 80 }}
+        contentContainerStyle={{ paddingBottom: 0 }}
       />
 
       <View style={styles.filterContainer}>
@@ -103,6 +106,27 @@ export default function HomeScreen({ navigation }: any) {
         </Text>
       </TouchableOpacity>
 
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: "#17a2b8", marginTop: 10 }]}
+        onPress={async () => {
+          const tasksJson = await exportTasks();
+          if (tasksJson) {
+            alert("Tarefas exportadas com sucesso! Copie o JSON:\n\n" + tasksJson);
+          } else {
+            alert("Nenhuma tarefa para exportar.");
+          }
+        }}
+      >
+        <Text style={styles.buttonText}>Exportar Tarefas</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: "#ffc107", marginTop: 10 }]}
+        onPress={() => setImportModalVisible(true)}
+      >
+        <Text style={styles.buttonText}>Importar Tarefas</Text>
+      </TouchableOpacity>
+
       <CustomModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -123,6 +147,23 @@ export default function HomeScreen({ navigation }: any) {
           clearTasks();
           setClearModalVisible(false);
         }}
+      />
+
+      <CustomModal
+        visible={importModalVisible}
+        onClose={() => setImportModalVisible(false)}
+        title="Importar Tarefas"
+        message="Cole o JSON das tarefas para importar:"
+        onConfirm={(text: string) => {
+          if (text) {
+            importTasks(text);
+            alert("Tarefas importadas com sucesso!");
+          } else {
+            alert("Nenhum JSON fornecido.");
+          }
+          setImportModalVisible(false);
+        }}
+        showTextInput={true}
       />
     </View>
   );
