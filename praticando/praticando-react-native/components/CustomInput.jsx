@@ -1,9 +1,4 @@
-import { StyleSheet, TextInput, TextInputProps } from "react-native";
-
-interface CustomInputProps extends TextInputProps {
-  multiline?: boolean;
-  required?: boolean;
-}
+import { StyleSheet, TextInput } from "react-native";
 
 export default function CustomInput({
   value,
@@ -11,19 +6,11 @@ export default function CustomInput({
   placeholder,
   multiline = false,
   style,
-  required = false,
   ...props
-}: CustomInputProps) {
-  const showError = required && !value;
-
+}) {
   return (
     <TextInput
-      style={[
-        styles.input,
-        multiline && styles.multiline,
-        showError && styles.errorInput,
-        style,
-      ]}
+      style={[styles.input, multiline && styles.multiline, style]}
       value={value}
       onChangeText={onChangeText}
       placeholder={placeholder}
@@ -47,8 +34,5 @@ const styles = StyleSheet.create({
   multiline: {
     height: 100,
     textAlignVertical: "top",
-  },
-  errorInput: {
-    borderColor: "#dc3545",
   },
 });

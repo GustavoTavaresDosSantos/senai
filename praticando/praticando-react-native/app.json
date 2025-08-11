@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "praticando-react-native",
-    "slug": "praticando-react-native",
+    "name": "taskApp",
+    "slug": "taskApp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
