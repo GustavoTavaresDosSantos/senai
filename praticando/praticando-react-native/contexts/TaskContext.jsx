@@ -21,6 +21,7 @@ export function TaskProvider({ children }) {
           } else {
             console.warn("Dados inválidos, inicializando com array vazio");
             setLocalTasks([]);
+            await AsyncStorage.setItem("@TaskApp:tasks", JSON.stringify([]));
           }
         }
       } catch (err) {
@@ -51,6 +52,7 @@ export function TaskProvider({ children }) {
         id: id || `local-${Date.now()}`,
         title,
         description: description || "",
+        priority: priority || "baixa",
         completed: false,
       },
     ]);
