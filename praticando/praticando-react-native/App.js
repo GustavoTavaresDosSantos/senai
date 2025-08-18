@@ -1,8 +1,4 @@
-import {
-  NavigationContainer,
-  DarkTheme,
-  DefaultTheme,
-} from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
@@ -13,7 +9,8 @@ import AddTaskScreen from "./screens/AddTaskScreen";
 import DetailsScreen from "./screens/DetailsScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import SettingsScreen from "./screens/SettingsScreen";
-import { TaskProvider, useTasks } from "./contexts/TaskContext";
+import { Provider } from "react-redux";
+import { store } from "./store";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -112,20 +109,12 @@ function DrawerNavigator() {
   );
 }
 
-function AppContent() {
-  const { theme } = useTasks();
-
-  return (
-    <NavigationContainer theme={theme === "dark" ? DarkTheme : DefaultTheme}>
-      <DrawerNavigator theme={theme === "dark" ? DarkTheme : DefaultTheme} />
-    </NavigationContainer>
-  );
-}
-
 export default function App() {
   return (
-    <TaskProvider>
-      <AppContent />
-    </TaskProvider>
+    <Provider store={store}>
+      <NavigationContainer>
+        <DrawerNavigator />
+      </NavigationContainer>
+    </Provider>
   );
 }

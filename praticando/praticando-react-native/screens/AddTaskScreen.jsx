@@ -6,7 +6,8 @@ import { Picker } from "@react-native-picker/picker";
 import axios from "axios";
 import CustomInput from "../components/CustomInput";
 import CustomButton from "../components/CustomButton";
-import { useTasks } from "../contexts/TaskContext";
+import { useSelector, useDispatch } from "react-redux";
+import { addTask } from "../features/tasks/tasksSlice";
 
 const validationSchema = Yup.object().shape({
   title: Yup.string()
@@ -21,7 +22,8 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function AddTaskScreen({ navigation }) {
-  const { addTask, theme } = useTasks();
+  const dispatch = useDispatch();
+  const theme = useSelector((state) => state.theme.value);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -37,11 +39,13 @@ export default function AddTaskScreen({ navigation }) {
         completed: false,
       });
 
-      addTask({
-        title: values.title,
-        description: values.description,
-        priority: values.priority,
-      });
+      dispatch(
+        addTask({
+          title: values.title,
+          description: values.description,
+          priority: values.priority,
+        })
+      );
 
       setSuccessMessage("Tarefa adicionada com sucesso!");
       setTimeout(() => {

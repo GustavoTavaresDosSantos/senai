@@ -1,5 +1,6 @@
 import { StyleSheet, Modal, View, Text } from "react-native";
 import CustomButton from "./CustomButton";
+import { useSelector } from "react-redux";
 
 export default function CustomModal({
   visible,
@@ -10,6 +11,7 @@ export default function CustomModal({
   cancelText = "Cancelar",
   onConfirm,
 }) {
+  const { theme } = useSelector((state) => state.tasks);
   return (
     <Modal
       transparent
@@ -18,9 +20,28 @@ export default function CustomModal({
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>{title}</Text>
-          <Text style={styles.modalMessage}>{message}</Text>
+        <View
+          style={[
+            styles.modalContainer,
+            theme === "dark" && { backgroundColor: "#333" },
+          ]}
+        >
+          <Text
+            style={[
+              styles.modalTitle,
+              theme === "dark" && { backgroundColor: "#333" },
+            ]}
+          >
+            {title}
+          </Text>
+          <Text
+            style={[
+              styles.modalMessage,
+              theme === "dark" && { backgroundColor: "#333" },
+            ]}
+          >
+            {message}
+          </Text>
           <View style={styles.buttonContainer}>
             <CustomButton
               title={cancelText}

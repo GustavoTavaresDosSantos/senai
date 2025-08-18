@@ -1,5 +1,5 @@
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
-import { useTasks } from "../contexts/TaskContext";
+import { useSelector } from "react-redux";
 
 export default function TaskCard({
   title,
@@ -10,7 +10,7 @@ export default function TaskCard({
   isLocal,
   onDelete,
 }) {
-  const { theme } = useTasks();
+  const { theme } = useSelector((state) => state.tasks);
 
   const getPriorityColor = () => {
     switch (priority) {

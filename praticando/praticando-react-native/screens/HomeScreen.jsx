@@ -6,49 +6,65 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import TaskCard from "../components/TaskCard";
 import CustomButton from "../components/CustomButton";
 import CustomModal from "../components/CustomModal";
-import { useTasks } from "../contexts/TaskContext";
+import {
+  loadTasks,
+  deleteTask,
+  clearTasks,
+  toggleTaskCompletion,
+} from "../features/tasks/tasksSlice";
 
 export default function HomeScreen({ navigation }) {
-  const {
-    localTasks,
-    toggleTaskCompletion,
-    deleteTask,
-    getCompletedCount,
-    theme,
-  } = useTasks();
+  const { localTasks, theme } = useSelector((state) => state.tasks);
+  const dispatch = useDispatch();
   const [apiTasks, setApiTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");
+  const [priorityFilter, setPriorityFilter] = useState("all");
   const [modalVisible, setModalVisible] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
   const [clearModalVisible, setClearModalVisible] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
+    fetchApiTasks();
+    dispatch(loadTasks());
+  }, [dispatch]);
+
+  const fetchApiTasks = () => {
     setIsLoading(true);
     axios
       .get("https://jsonplaceholder.typicode.com/todos?_limit=5")
       .then((response) => {
-        setApiTasks(response.data);
+        const tasksWithPriority = response.data.map((task) => ({
+          ...task,
+          priority: ["alta", "media", "baixa"][Math.floor(Math.random() * 3)],
+        }));
+        setApiTasks(tasksWithPriority);
         setIsLoading(false);
       })
-      .catch((err) => {
+      .catch(() => {
         setError("Erro ao carregar tarefas da API");
         setIsLoading(false);
       });
-  }, []);
+  };
 
   const allTasks = [...apiTasks, ...localTasks];
   const filteredTasks = allTasks.filter((task) => {
-    if (filter === "pending") return !task.completed;
-    if (filter === "completed") return task.completed;
+    if (filter === "pending" && task.completed) return false;
+    if (filter === "completed" && !task.completed) return false;
+    if (priorityFilter !== "all" && task.priority !== priorityFilter)
+      return false;
     return true;
   });
+
+  const getCompletedCount = () =>
+    allTasks.filter((task) => task.completed).length;
 
   const renderItem = ({ item }) => {
     const isLocal = typeof item.id === "string";
@@ -60,7 +76,9 @@ export default function HomeScreen({ navigation }) {
         onPress={
           isLocal ? () => navigation.navigate("Details", { task: item }) : null
         }
-        onToggle={isLocal ? () => toggleTaskCompletion(item.id) : null}
+        onToggle={
+          isLocal ? () => dispatch(toggleTaskCompletion(item.id)) : null
+        }
         isLocal={isLocal}
         onDelete={
           isLocal
@@ -74,6 +92,13 @@ export default function HomeScreen({ navigation }) {
     );
   };
 
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(""), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
   return (
     <View style={[styles.container, theme === "dark" && styles.darkContainer]}>
       <Text style={[styles.title, theme === "dark" && styles.darkText]}>
@@ -82,32 +107,45 @@ export default function HomeScreen({ navigation }) {
       <Text style={[styles.counterText, theme === "dark" && styles.darkText]}>
         Tarefas: {filteredTasks.length} | Concluídas: {getCompletedCount()}
       </Text>
+
       {successMessage ? (
         <Text style={styles.successText}>{successMessage}</Text>
       ) : null}
+
       <View style={styles.filterContainer}>
-        <CustomButton
-          title="Todas"
-          onPress={() => setFilter("all")}
-          color={filter === "all" ? "#007bff" : "#ddd"}
-          textStyle={{ color: filter === "all" ? "#fff" : "#333" }}
-          size="small"
-        />
-        <CustomButton
-          title="Pendentes"
-          onPress={() => setFilter("pending")}
-          color={filter === "pending" ? "#007bff" : "#ddd"}
-          textStyle={{ color: filter === "pending" ? "#fff" : "#333" }}
-          size="small"
-        />
-        <CustomButton
-          title="Concluídas"
-          onPress={() => setFilter("completed")}
-          color={filter === "completed" ? "#007bff" : "#ddd"}
-          textStyle={{ color: filter === "completed" ? "#fff" : "#333" }}
-          size="small"
-        />
+        {["all", "pending", "completed"].map((f) => (
+          <CustomButton
+            key={f}
+            title={
+              f === "all"
+                ? "Todas"
+                : f === "pending"
+                ? "Pendentes"
+                : "Concluídas"
+            }
+            onPress={() => setFilter(f)}
+            color={filter === f ? "#007bff" : "#ddd"}
+            textStyle={{ color: filter === f ? "#fff" : "#333" }}
+            size="small"
+          />
+        ))}
       </View>
+
+      <View style={styles.filterContainer}>
+        {["all", "alta", "media", "baixa"].map((p) => (
+          <CustomButton
+            key={p}
+            title={
+              p === "all" ? "Todas" : p.charAt(0).toUpperCase() + p.slice(1)
+            }
+            onPress={() => setPriorityFilter(p)}
+            color={priorityFilter === p ? "#007bff" : "#ddd"}
+            textStyle={{ color: priorityFilter === p ? "#fff" : "#333" }}
+            size="small"
+          />
+        ))}
+      </View>
+
       {isLoading ? (
         <ActivityIndicator size="large" color="#007bff" />
       ) : error ? (
@@ -119,24 +157,14 @@ export default function HomeScreen({ navigation }) {
             title="Tentar Novamente"
             onPress={() => {
               setError(null);
-              setIsLoading(true);
-              axios
-                .get("https://jsonplaceholder.typicode.com/todos?_limit=5")
-                .then((response) => {
-                  setApiTasks(response.data);
-                  setIsLoading(false);
-                })
-                .catch((err) => {
-                  setError("Erro ao carregar tarefas da API");
-                  setIsLoading(false);
-                });
+              fetchApiTasks();
             }}
             color="#ffc107"
           />
         </>
       ) : filteredTasks.length === 0 ? (
         <Text style={[styles.emptyText, theme === "dark" && styles.darkText]}>
-          Nenhuma tarefa adicionada
+          Nenhuma tarefa encontrada
         </Text>
       ) : (
         <FlatList
@@ -147,31 +175,33 @@ export default function HomeScreen({ navigation }) {
           ItemSeparatorComponent={() => <View style={styles.separator} />}
         />
       )}
+
       <CustomButton
         title="Adicionar Tarefa"
         onPress={() => navigation.navigate("AddTask")}
         color="#28a745"
       />
+
       <CustomModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         title="Confirmar Exclusão"
         message="Deseja realmente excluir esta tarefa?"
         onConfirm={() => {
-          deleteTask(taskToDelete);
+          if (taskToDelete) dispatch(deleteTask(taskToDelete));
           setModalVisible(false);
           setTaskToDelete(null);
           setSuccessMessage("Tarefa excluída com sucesso!");
-          setTimeout(() => setSuccessMessage(""), 2000);
         }}
       />
+
       <CustomModal
         visible={clearModalVisible}
         onClose={() => setClearModalVisible(false)}
         title="Limpar Tarefas"
         message="Deseja excluir todas as tarefas locais?"
         onConfirm={() => {
-          clearTasks();
+          dispatch(clearTasks());
           setClearModalVisible(false);
         }}
       />
@@ -212,6 +242,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     marginBottom: 10,
+    flexWrap: "wrap",
   },
   emptyText: {
     fontSize: 16,

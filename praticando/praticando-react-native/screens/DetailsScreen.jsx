@@ -1,9 +1,9 @@
 import { StyleSheet, View, Text } from "react-native";
-import { useTasks } from "../contexts/TaskContext"; // corrigido o caminho
+import { useSelector } from "react-redux";
 
 export default function DetailsScreen({ route }) {
   const { task } = route.params;
-  const { theme } = useTasks();
+  const { theme } = useSelector((state) => state.tasks);
 
   const isDark = theme === "dark";
 

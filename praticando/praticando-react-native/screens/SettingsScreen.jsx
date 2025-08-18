@@ -1,22 +1,35 @@
 import { StyleSheet, View, Text } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CustomButton from "../components/CustomButton";
-import { useTasks } from "../contexts/TaskContext"; // corrigido o caminho
 import CustomModal from "../components/CustomModal";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  increment,
+  decrement,
+  reset,
+  incrementByAmount,
+} from "../features/counterSlice";
+import {
+  toggleTheme,
+  clearTasks,
+  exportTasks,
+  restoreTasks,
+  saveTasks,
+} from "../features/tasks/tasksSlice";
 
 export default function SettingsScreen({ navigation }) {
-  // <-- recebeu navigation
-  const { toggleTheme, theme, clearTasks, exportTasks, restoreTasks } =
-    useTasks();
+  const { theme } = useSelector((state) => state.tasks);
   const [modalVisible, setModalVisible] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const counter = useSelector((state) => state.counter.value);
+  const dispatch = useDispatch();
 
   const handleClearTasks = async () => {
     try {
-      await clearTasks();
+      await dispatch(clearTasks());
+      await dispatch(saveTasks([]));
       setModalVisible(false);
       setSuccessMessage("Tarefas limpas com sucesso!");
-      setTimeout(() => setSuccessMessage(""), 2000);
     } catch {
       setModalVisible(false);
       setSuccessMessage("");
@@ -26,9 +39,8 @@ export default function SettingsScreen({ navigation }) {
 
   const handleExport = async () => {
     try {
-      const message = await exportTasks();
-      setSuccessMessage(message);
-      setTimeout(() => setSuccessMessage(""), 2000);
+      const result = await dispatch(exportTasks()).unwrap();
+      setSuccessMessage(result);
     } catch (err) {
       setSuccessMessage("");
       alert(err.message);
@@ -37,27 +49,59 @@ export default function SettingsScreen({ navigation }) {
 
   const handleRestore = async () => {
     try {
-      const message = await restoreTasks();
-      setSuccessMessage(message);
-      setTimeout(() => setSuccessMessage(""), 2000);
+      const result = await dispatch(restoreTasks()).unwrap();
+      setSuccessMessage("Backup restaurado com sucesso!");
     } catch (err) {
       setSuccessMessage("");
       alert(err.message);
     }
   };
 
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(""), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
   return (
     <View style={[styles.container, theme === "dark" && styles.darkContainer]}>
       <Text style={[styles.title, theme === "dark" && styles.darkText]}>
         Configurações
       </Text>
+
       {successMessage ? (
         <Text style={styles.successText}>{successMessage}</Text>
       ) : null}
 
+      <Text style={[styles.title, theme === "dark" && styles.darkText]}>
+        Contador: {counter}
+      </Text>
+
+      <CustomButton
+        title="Incrementar"
+        onPress={() => dispatch(increment())}
+        color="#007bff"
+      />
+      <CustomButton
+        title="Incrementar por 5"
+        onPress={() => dispatch(incrementByAmount(5))}
+        color="#007bff"
+      />
+      <CustomButton
+        title="Decrementar"
+        onPress={() => dispatch(decrement())}
+        color="#007bff"
+      />
+      <CustomButton
+        title="Resetar Contador"
+        onPress={() => dispatch(reset())}
+        color="#007bff"
+      />
+
       <CustomButton
         title={`Mudar para Tema ${theme === "light" ? "Escuro" : "Claro"}`}
-        onPress={toggleTheme}
+        onPress={() => dispatch(toggleTheme())}
         color="#007bff"
       />
 
@@ -87,7 +131,6 @@ export default function SettingsScreen({ navigation }) {
         onConfirm={handleClearTasks}
       />
 
-      {/* Botão para abrir o drawer */}
       <CustomButton
         title="Abrir Menu"
         onPress={() => navigation.toggleDrawer()}
@@ -113,6 +156,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     color: "#333",
+    textAlign: "center",
   },
   successText: {
     fontSize: 16,
