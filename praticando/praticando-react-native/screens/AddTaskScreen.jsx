@@ -8,6 +8,7 @@ import CustomInput from "../components/CustomInput";
 import CustomButton from "../components/CustomButton";
 import { useSelector, useDispatch } from "react-redux";
 import { addTask } from "../features/tasks/tasksSlice";
+import * as Location from "expo-location";
 
 const validationSchema = Yup.object().shape({
   title: Yup.string()
@@ -21,9 +22,51 @@ const validationSchema = Yup.object().shape({
   priority: Yup.string().required("Selecione uma prioridade"),
 });
 
+const handleSubmit = async (values, { resetForm }) => {
+  if (!acceptTerms) {
+    Alert.alert("Erro", "Você deve aceitar os termos para continuar.");
+    return;
+  }
+
+  try {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permissão de localização negada");
+      return;
+    }
+    const locationData = await Location.getCurrentPositionAsync({});
+    const { latitude, longitude } = locationData.coords;
+
+    await axios.post("http://jsonplaceholder.typicode.com/todos", {
+      title: values.title,
+      completed: false,
+    });
+
+    dispatch(
+      addTask({
+        title: values.title,
+        description: values.description,
+        priority: values.priority,
+        latitude,
+        longitude,
+      })
+    );
+
+    setSuccessMessage("Tarefa adicionada com sucesso!");
+    setTimeout(() => {
+      setSuccessMessage("");
+      resetForm();
+      setAcceptTerms(false);
+      navigation.goBack();
+    }, 1000);
+  } catch (err) {
+    Alert.alert("Erro", "Falha ao salvar na API");
+  }
+};
+
 export default function AddTaskScreen({ navigation }) {
   const dispatch = useDispatch();
-  const theme = useSelector((state) => state.theme.value);
+  const theme = useSelector((state) => state.tasks.theme);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 

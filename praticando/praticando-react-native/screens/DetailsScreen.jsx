@@ -18,8 +18,16 @@ export default function DetailsScreen({ route }) {
       <Text style={[styles.detail, isDark && styles.darkDetail]}>
         Prioridade: {task.priority || "Não definida"}
       </Text>
+
       <Text style={[styles.detail, isDark && styles.darkDetail]}>
         Status: {task.completed ? "Concluída" : "Pendente"}
+      </Text>
+      <Text style={[styles.detail, isDark && styles.darkDetail]}>
+        Latitude: {task.latitude ? task.latitude.toFixed(6) : "Não informada"}
+      </Text>
+      <Text style={[styles.detail, isDark && styles.darkDetail]}>
+        Longitude:{" "}
+        {task.longitude ? task.longitude.toFixed(6) : "Não informada"}
       </Text>
     </View>
   );

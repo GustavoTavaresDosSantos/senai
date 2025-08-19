@@ -97,6 +97,17 @@ const tasksSlice = createSlice({
     toggleTheme: (state) => {
       state.theme = state.theme === "light" ? "dark" : "light";
     },
+    addTask: (state, action) => {
+      state.localTasks.push({
+        id: action.payload.id || `local-${Date.now()}`,
+        title: action.payload.title,
+        description: action.payload.description || "",
+        priority: action.payload.priority || "baixa",
+        latitude: action.payload.latitude || null, // 👈 adicionando localização
+        longitude: action.payload.longitude || null, // 👈 adicionando localização
+        completed: false,
+      });
+    },
   },
   extraReducers: (builder) => {
     builder
